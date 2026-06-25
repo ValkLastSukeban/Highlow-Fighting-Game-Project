@@ -241,7 +241,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   gameManagerEventChannel: {fileID: 11400000, guid: 01db31ae3fe706849a807d89e6c51dc8, type: 2}
-  fighterMoves: {fileID: 6432439512034161516}
+  playerID: 0
 --- !u!114 &6432439512034161516
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -255,14 +255,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   gameManagerEventChannel: {fileID: 11400000, guid: 01db31ae3fe706849a807d89e6c51dc8, type: 2}
+  inputController: {fileID: 4515154468939330224}
   animationController: {fileID: 4332122243833493240}
   fighterRigidbody2D: {fileID: 6643139435321052749}
-  playerID: 0
+  moveSpeed: 4
+  moveSpeedCrouching: 2
   attackHighFrameDuration: 15
   dashDistance: 2
   dashFrameDuration: 15
-  moveSpeed: 4
-  moveSpeedCrouching: 2
 --- !u!114 &4332122243833493240
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -4,11 +4,11 @@ public class GameRules : MonoBehaviour
 {
     [SerializeField] private GameRulesData gameRulesData;
 
-    internal static float PlayersStartingPosition { get; private set; }
+    internal static Vector3 PlayersStartingPosition { get; private set; }
+    internal static float ArenaHorizontalLimit { get; private set; }
     internal static float RoundStartIntroTime { get; private set; }
-
     
-    private void Awake()
+    private void OnEnable()
     {
         LoadGameRulesData();
     }
@@ -16,6 +16,7 @@ public class GameRules : MonoBehaviour
     private void LoadGameRulesData()
     {
         PlayersStartingPosition = gameRulesData.playersStartingPosition;
+        ArenaHorizontalLimit = gameRulesData.arenaHorizontalLimit;
         RoundStartIntroTime = gameRulesData.roundStartShowTime;
     }
 }

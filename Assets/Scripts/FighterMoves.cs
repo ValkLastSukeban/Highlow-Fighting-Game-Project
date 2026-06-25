@@ -1,21 +1,26 @@
 using DefaultNamespace.Event_Channel;
+using Event_Channel;
 using UnityEngine;
 
 public class FighterMoves : MonoBehaviour
 {
     [Header("Event Channel")] [SerializeField]
     private GameManagerEventChannel gameManagerEventChannel;
-
-    [Header("Scripts References")] [SerializeField]
-    private AnimationController animationController;
-
+    
+    [Header("Components")]
     [SerializeField] private Rigidbody2D fighterRigidbody2D;
+
+    [Header("Scripts References")] 
+    [SerializeField] private InputController inputController;
+    [SerializeField] private AnimationController animationController;
 
     [Header("Fighter Values")]
     [SerializeField] private float moveSpeed;
     [SerializeField] private float moveSpeedCrouching;
     private Vector2 _movementAxis;
+    
     [SerializeField] private float attackHighFrameDuration;
+    
     [SerializeField] private float dashDistance;
     [SerializeField] private float dashFrameDuration;
     private float _dashInputAxis;
@@ -23,47 +28,127 @@ public class FighterMoves : MonoBehaviour
 
     private float _actualActionFrameTime;
 
-    internal FighterStance ActualStance { private set; get; }
-    internal FighterAction ActualAction { private set; get; }
+    [SerializeField] private FighterStance fighterStance;
+    [SerializeField] private FighterAction fighterAction;
+    
+    [SerializeField] private FighterID fighterID = FighterID.Fighter1;
     
     private ArenaSide _arenaSide;
 
-    private PlayerID _fighterID;
-
-
-    private void Start()
+    private float _xAxisLimit;
+    
+    internal void InitializeFighter()
     {
-        ActualAction = FighterAction.Idle;
-        ActualStance = FighterStance.Standing;
+        InitializeAction();
+        InitializeStance();
+        InitializePosition();
+        GetXAxisLimit();
+        RegisterFighterActions();
+    }
+
+    private void InitializeAction()
+    {
+        fighterAction.ChangeAction(FighterActions.Idle);
+    }
+
+    private void InitializeStance()
+    {
+        fighterStance.ChangeStance(FighterStances.Standing);
+    }
+
+    private void InitializePosition()
+    {
+        transform.position = fighterID == FighterID.Fighter1
+            ? -GameRules.PlayersStartingPosition
+            : GameRules.PlayersStartingPosition;
+    }
+
+    private void GetXAxisLimit()
+    {
+        _xAxisLimit = GameRules.ArenaHorizontalLimit;
+    }
+
+    private void RegisterFighterActions()
+    {
+        if (!inputController) return;
+        inputController.OnMovePerformed += StartMoving;
+        inputController.OnMoveStopped += StopMoving;
     }
     
-    internal void SetFighterID(PlayerID playerID)
+    private void OnDisable()
     {
-        _fighterID = playerID;
-        _arenaSide = _fighterID == PlayerID.Player1 ? ArenaSide.Left : ArenaSide.Right;
+        UnregisterActions();
     }
 
-    internal void StartMoving(float movementInputAxis)
+    private void UnregisterActions()
     {
-        ActualAction = FighterAction.Moving;
+        if (!inputController) return;
+        inputController.OnMovePerformed -= StartMoving;
+        inputController.OnMoveStopped -= StopMoving;
+    }
+
+    private void StartMoving(float movementInputAxis)
+    {
+        fighterAction.ChangeAction(FighterActions.Moving);
         animationController.Movement(movementInputAxis);
         _movementAxis.x = movementInputAxis;
     }
 
-    internal void StopMoving()
+    private void StopMoving()
     {
-        ActualAction = FighterAction.Idle;
+        fighterAction.ChangeAction(FighterActions.Idle);
         animationController.Movement(0);
         _movementAxis.x = 0;
     }
 
+    internal void StartDashing(float dashInputAxis)
+    {
+        fighterAction.ChangeAction(FighterActions.Dashing);
+
+        _actualActionFrameTime = dashFrameDuration;
+    }
+
+    private void FixedUpdate()
+    {
+        switch (fighterAction.ActualAction)
+        {
+            case FighterActions.Dashing:
+                UpdateDash();
+                break;
+
+            case FighterActions.Moving:
+                UpdateMovement();
+                break;
+
+            case FighterActions.Idle:
+                UpdateIdle();
+                break;
+
+            case FighterActions.Attacking:
+                UpdateAttack();
+                break;
+        }
+    }
+    
+    private void UpdateDash()
+    {
+        _dashTimer -= Time.fixedDeltaTime;
+
+        fighterRigidbody2D.MovePosition(fighterRigidbody2D.position * dashDistance * Time.fixedDeltaTime);
+
+        if (_dashTimer <= 0)
+        {
+            fighterAction.ChangeAction(FighterActions.Idle);
+        }
+    }
+    
     private void UpdateMovement()
     {
-        if (ActualStance == FighterStance.Standing)
+        if (fighterStance.ActualStance == FighterStances.Standing)
         {
             fighterRigidbody2D.MovePosition(fighterRigidbody2D.position +_movementAxis * moveSpeed * Time.fixedDeltaTime);
         }
-        else if (ActualStance == FighterStance.Crouching)
+        else if (fighterStance.ActualStance == FighterStances.Crouching)
         {
             fighterRigidbody2D.MovePosition(fighterRigidbody2D.position +_movementAxis * moveSpeedCrouching * Time.fixedDeltaTime);
         }
@@ -74,53 +159,11 @@ public class FighterMoves : MonoBehaviour
         fighterRigidbody2D.linearVelocity = new Vector2(0, fighterRigidbody2D.linearVelocity.y);
     }
 
-    internal void StartDashing(float dashInputAxis)
-    {
-        ActualAction = FighterAction.Dashing;
-
-        _actualActionFrameTime = dashFrameDuration;
-        SetFighterID(dashInputAxis > 0 ? ArenaSide.Right : ArenaSide.Left);
-    }
-
-    private void UpdateDash()
-    {
-        _dashTimer -= Time.fixedDeltaTime;
-
-        fighterRigidbody2D.MovePosition(fighterRigidbody2D.position * dashDistance * Time.fixedDeltaTime);
-
-        if (_dashTimer <= 0)
-        {
-            ActualAction = FighterAction.Idle;
-        }
-    }
-
     private void UpdateAttack()
     {
         if (_actualActionFrameTime > attackHighFrameDuration)
         {
-            ActualAction = FighterAction.Idle;
-        }
-    }
-
-    private void FixedUpdate()
-    {
-        switch (ActualAction)
-        {
-            case FighterAction.Dashing:
-                UpdateDash();
-                break;
-
-            case FighterAction.Moving:
-                UpdateMovement();
-                break;
-
-            case FighterAction.Idle:
-                UpdateIdle();
-                break;
-
-            case FighterAction.Attacking:
-                UpdateAttack();
-                break;
+            fighterAction.ChangeAction(FighterActions.Idle);
         }
     }
 
@@ -128,25 +171,25 @@ public class FighterMoves : MonoBehaviour
     {
         if (attackType == AttackHeight.High)
         {
-            if (IsStanding())
+            if (fighterStance.IsStanding())
             {
-                if (IsAbleToBlock())
+                if (fighterAction.IsAbleToBlock())
                 {
                     animationController.BlockHigh();
                 }
                 else
                 {
                     animationController.LaunchedWhileStanding();
-                    gameManagerEventChannel.InvokeOnPlayerHit(_fighterID);
+                    gameManagerEventChannel.InvokeOnPlayerHit(fighterID);
                 }
             }
         }
 
         if (attackType == AttackHeight.Low)
         {
-            if (IsCrouching())
+            if (fighterStance.IsCrouching())
             {
-                if (IsAbleToBlock())
+                if (fighterAction.IsAbleToBlock())
                 {
                     animationController.BlockLow();
                 }
@@ -155,10 +198,10 @@ public class FighterMoves : MonoBehaviour
                     animationController.KnockedOutWhileCrouching();
                 }
             }
-            else if (IsStanding())
+            else if (fighterStance.IsStanding())
             {
                 animationController.KnockedOutWhileStanding();
-                gameManagerEventChannel.InvokeOnPlayerHit(_fighterID);
+                gameManagerEventChannel.InvokeOnPlayerHit(fighterID);
             }
         }
     }
@@ -174,8 +217,8 @@ public class FighterMoves : MonoBehaviour
 
     internal void ExecuteAttackHigh()
     {
-        ActualStance = FighterStance.Standing;
-        ActualAction = FighterAction.Attacking;
+        fighterStance.ChangeStance(FighterStances.Standing);
+        fighterAction.ChangeAction(FighterActions.Attacking);
         animationController.AttackHigh();
     }
 
@@ -198,42 +241,7 @@ public class FighterMoves : MonoBehaviour
     {
         animationController.Sway();
     }
-
-    private bool IsAbleToBlock()
-    {
-        return ActualAction is FighterAction.Blocking or FighterAction.Idle or FighterAction.Moving;
-    }
-
-    private bool IsStanding()
-    {
-        return ActualStance is FighterStance.Standing;
-    }
-
-    private bool IsCrouching()
-    {
-        return ActualStance is FighterStance.Crouching;
-    }
-
-    private bool IsAttacking()
-    {
-        return ActualAction is FighterAction.Attacking;
-    }
-
-    private bool IsBlocking()
-    {
-        return ActualAction is FighterAction.Blocking;
-    }
-
-    private bool IsIdle()
-    {
-        return ActualAction is FighterAction.Idle;
-    }
-
-    private void SetFighterID(ArenaSide newSide)
-    {
-        _arenaSide = newSide;
-    }
-
+    
     private int GetFacingDirection()
     {
         return _arenaSide == ArenaSide.Left ? -1 : 1;

@@ -3,11 +3,11 @@ using UnityEngine;
 
 public class Hitbox : MonoBehaviour
 {
-    [SerializeField] private FighterMoves fighterMoves;
+    [SerializeField] private FighterMoves fighterActions;
 
     internal void HasBeenHit(AttackHeight attackType)
     {
-        fighterMoves.GotHit(attackType);
+        fighterActions.GotHit(attackType);
     }
     
 }

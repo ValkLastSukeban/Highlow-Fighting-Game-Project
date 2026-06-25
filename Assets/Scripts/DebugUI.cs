@@ -1,30 +1,43 @@
 using System;
+using Event_Channel;
 using TMPro;
 using UnityEngine;
 
 public class DebugUI : MonoBehaviour
 {
     [SerializeField] private TMP_Text fighterStatusText;
-    [SerializeField] private FighterMoves fighterReference;
+    [SerializeField] private DebugEventChannel debugEventChannel;
 
-    private void FetchFighterInfo()
+    private string actualActionString;
+    private string actualStanceString;
+    private void OnEnable()
     {
-        if (fighterReference == null) return;
-        SetFighterStatusText(fighterReference.ActualStance.ToString(), fighterReference.ActualAction.ToString());
+        debugEventChannel.FighterActionChanged += SetFighterActionString;
+        debugEventChannel.FighterStanceChanged += SetFighterStanceString;
     }
     
-    private void SetFighterStatusText(string actualStance, string actualAction)
+    private void OnDisable()
+    {
+        debugEventChannel.FighterActionChanged -= SetFighterActionString;
+        debugEventChannel.FighterStanceChanged -= SetFighterStanceString;
+    }
+
+    private void UpdateFighterInfoText()
     {
         fighterStatusText.text =
-            $" {actualAction}; {actualStance}";
+            $" {actualActionString}; {actualStanceString}";
     }
-    
-    private void Update()
-    {
-        FetchFighterInfo(); 
-    }
-    
 
-    
+    private void SetFighterActionString(FighterActions action)
+    {
+        actualActionString = action.ToString();
+    }
+
+    private void SetFighterStanceString(FighterStances stance)
+    {
+        actualStanceString = stance.ToString();
+    }
+
+
 
 }

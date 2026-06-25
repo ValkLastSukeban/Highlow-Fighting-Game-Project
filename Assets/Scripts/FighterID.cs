@@ -1,0 +1,1 @@
+﻿public enum FighterID { Fighter1, Fighter2 }

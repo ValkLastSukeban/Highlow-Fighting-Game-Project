@@ -1,4 +1,6 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
+using Event_Channel;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -7,13 +9,12 @@ public class InputController : MonoBehaviour
 {
     [Header("Event Channel")] [SerializeField]
     private GameManagerEventChannel gameManagerEventChannel;
-
-    [Header("Script Reference")] [SerializeField]
-    private FighterMoves fighterMoves;
-
-    [Header("Player ID")] [SerializeField] private PlayerID playerID = PlayerID.Player1;
+    
+    [Header("Controller ID")] [SerializeField] private ControllerID controllerID = ControllerID.Controller1;
+    internal ControllerID ControllerID => controllerID;
 
     private PlayerInputSystem _playerInputSystem;
+    
     private void Awake()
     {
         _playerInputSystem = new PlayerInputSystem();
@@ -22,9 +23,8 @@ public class InputController : MonoBehaviour
     private void OnEnable()
     {
         gameManagerEventChannel.onRoundStart += DisableInputsByTime;
-        fighterMoves.SetFighterID(playerID);
 
-        if (playerID == PlayerID.Player1)
+        if (controllerID == ControllerID.Controller1)
         {
             _playerInputSystem.Fighter1.Move.performed += OnMoveInput;
             _playerInputSystem.Fighter1.Move.canceled += OnMoveInput;
@@ -36,7 +36,7 @@ public class InputController : MonoBehaviour
             _playerInputSystem.Fighter1.Down.canceled += OnDown;
             _playerInputSystem.Fighter1.Sway.started += OnSway;
         }
-        else
+        else if (controllerID == ControllerID.Controller2)
         {
             _playerInputSystem.Fighter2.Move.performed += OnMoveInput;
             _playerInputSystem.Fighter2.Move.canceled += OnMoveInput;
@@ -55,7 +55,7 @@ public class InputController : MonoBehaviour
     {
         gameManagerEventChannel.onRoundStart -= DisableInputsByTime;
 
-        if (playerID == PlayerID.Player1)
+        if (controllerID == ControllerID.Controller1)
         {
             _playerInputSystem.Fighter1.Move.performed -= OnMoveInput;
             _playerInputSystem.Fighter1.Move.canceled -= OnMoveInput;
@@ -68,7 +68,7 @@ public class InputController : MonoBehaviour
             _playerInputSystem.Fighter1.Sway.started -= OnSway;
 
         }
-        else
+        else if (controllerID == ControllerID.Controller2)
         {
             _playerInputSystem.Fighter2.Move.performed -= OnMoveInput;
             _playerInputSystem.Fighter2.Move.canceled -= OnMoveInput;
@@ -95,10 +95,12 @@ public class InputController : MonoBehaviour
         _playerInputSystem.Enable();
     }
     
+    internal event Action<float> OnMovePerformed;
+    internal event Action OnMoveStopped;
     private void OnMoveInput(InputAction.CallbackContext context)
     {
-        if(context.performed) fighterMoves.StartMoving(context.ReadValue<float>());
-        if(context.canceled) fighterMoves.StopMoving();
+        if(context.performed) OnMovePerformed?.Invoke(context.ReadValue<float>());
+        if(context.canceled) OnMoveStopped?.Invoke();
     }
 
     private void OnDown(InputAction.CallbackContext context)
