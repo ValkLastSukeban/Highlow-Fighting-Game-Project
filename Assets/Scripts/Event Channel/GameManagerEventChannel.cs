@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 using UnityEngine.Events;
 
@@ -6,22 +7,22 @@ namespace Event_Channel
     [CreateAssetMenu(fileName = "Game Manager Event Channel",menuName = "Scriptable Objects/Game Manager Event Channel")]
     public class GameManagerEventChannel : ScriptableObject
     {
-        internal UnityAction<FighterID> onPlayerHit;
-        internal void InvokeOnPlayerHit(FighterID fighterID)
+        internal event Action<FighterID> PlayerHit;
+        internal void OnPlayerHit(FighterID fighterID)
         {
-            onPlayerHit?.Invoke(fighterID);
+            PlayerHit?.Invoke(fighterID);
         }
 
-        internal UnityAction<float> onRoundStart;
-        internal void InvokeOnRoundStart(float showTime)
+        internal event Action<float> RoundStart;
+        internal void OnRoundStart(float showTime)
         {
-            onRoundStart?.Invoke(showTime);
+            RoundStart?.Invoke(showTime);
         }
 
-        internal UnityAction onFightStart;
+        internal event Action FightStart;
         internal void OnFightStart()
         {
-            onFightStart?.Invoke();
+            FightStart?.Invoke();
         }
 
 

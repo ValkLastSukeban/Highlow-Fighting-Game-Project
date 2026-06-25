@@ -180,7 +180,7 @@ public class FighterMoves : MonoBehaviour
                 else
                 {
                     animationController.LaunchedWhileStanding();
-                    gameManagerEventChannel.InvokeOnPlayerHit(fighterID);
+                    gameManagerEventChannel.OnPlayerHit(fighterID);
                 }
             }
         }
@@ -201,7 +201,7 @@ public class FighterMoves : MonoBehaviour
             else if (fighterStance.IsStanding())
             {
                 animationController.KnockedOutWhileStanding();
-                gameManagerEventChannel.InvokeOnPlayerHit(fighterID);
+                gameManagerEventChannel.OnPlayerHit(fighterID);
             }
         }
     }

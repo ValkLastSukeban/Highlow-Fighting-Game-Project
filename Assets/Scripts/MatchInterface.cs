@@ -10,7 +10,7 @@ public class MatchInterface : MonoBehaviour
 
     private void OnEnable()
     {
-        gameManagerEventChannel.onRoundStart += ShowRoundStartText;
+        gameManagerEventChannel.RoundStart += ShowRoundStartText;
     }
 
     private void ShowRoundStartText(float showTime)

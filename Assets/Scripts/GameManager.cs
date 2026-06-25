@@ -12,12 +12,12 @@ public class GameManager : MonoBehaviour
 
     private void OnEnable()
     {
-        gameManagerEventChannel.onPlayerHit += PlayerHasBeenHit;
+        gameManagerEventChannel.PlayerHit += PlayerHasBeenHit;
     }
 
     private void OnDisable()
     {
-        gameManagerEventChannel.onPlayerHit -= PlayerHasBeenHit;
+        gameManagerEventChannel.PlayerHit -= PlayerHasBeenHit;
     }
     
     private void Start()
@@ -28,7 +28,7 @@ public class GameManager : MonoBehaviour
 
     private void SetupRoundStart()
     {
-        gameManagerEventChannel.onRoundStart(GameRules.RoundStartIntroTime);
+        gameManagerEventChannel.OnRoundStart(GameRules.RoundStartIntroTime);
     }
 
     private void SetupFighters()

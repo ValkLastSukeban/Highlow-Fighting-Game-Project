@@ -22,7 +22,7 @@ public class InputController : MonoBehaviour
 
     private void OnEnable()
     {
-        gameManagerEventChannel.onRoundStart += DisableInputsByTime;
+        gameManagerEventChannel.RoundStart += DisableInputsByTime;
 
         if (controllerID == ControllerID.Controller1)
         {
@@ -53,7 +53,7 @@ public class InputController : MonoBehaviour
 
     private void OnDisable()
     {
-        gameManagerEventChannel.onRoundStart -= DisableInputsByTime;
+        gameManagerEventChannel.RoundStart -= DisableInputsByTime;
 
         if (controllerID == ControllerID.Controller1)
         {

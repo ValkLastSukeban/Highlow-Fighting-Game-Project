@@ -117,7 +117,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   fighterStatusText: {fileID: 1825199898899750240}
-  fighterReference: {fileID: 0}
+  debugEventChannel: {fileID: 11400000, guid: 75d89369ed7c3c7468458fb349cca7d8, type: 2}
 --- !u!1 &5719215201967122600
 GameObject:
   m_ObjectHideFlags: 0

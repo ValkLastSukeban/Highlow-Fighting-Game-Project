@@ -832,10 +832,6 @@ PrefabInstance:
       propertyPath: m_Camera
       value: 
       objectReference: {fileID: 559332729}
-    - target: {fileID: 6518908920755410461, guid: b131dded4ced8834897b12baedd0d977, type: 3}
-      propertyPath: fighterReference
-      value: 
-      objectReference: {fileID: 440114481}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -992,6 +988,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   gameManagerEventChannel: {fileID: 11400000, guid: 01db31ae3fe706849a807d89e6c51dc8, type: 2}
+  fighters:
+  - {fileID: 440114481}
+  - {fileID: 592182617}
 --- !u!114 &1580663646
 MonoBehaviour:
   m_ObjectHideFlags: 0

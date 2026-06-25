@@ -9,10 +9,6 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b68e4a7b88e168f42a8a602affa4792c, type: 3}
-  m_Name: GameRulesData
-  m_EditorClassIdentifier: 
-  playersStartingPosition: {x: 1.5, y: 0, z: 0}
-  roundStartShowTime: 2.8
-  allowWalking: 0
-  arenaHorizontalLimit: 2.4
+  m_Script: {fileID: 11500000, guid: e237af01bed14688ac0aeae158cae88b, type: 3}
+  m_Name: Debug Event Channel
+  m_EditorClassIdentifier: Assembly-CSharp::Event_Channel.DebugEventChannel
