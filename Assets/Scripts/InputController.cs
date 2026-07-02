@@ -28,24 +28,24 @@ public class InputController : MonoBehaviour
         {
             _playerInputSystem.Fighter1.Move.performed += OnMoveInput;
             _playerInputSystem.Fighter1.Move.canceled += OnMoveInput;
-            _playerInputSystem.Fighter1.AttackHigh.started += OnAttackHighInput;
-            _playerInputSystem.Fighter1.AttackLow.started += OnAttackLowInput;
+            _playerInputSystem.Fighter1.AttackHigh.started += OnHighAttackInput;
+            _playerInputSystem.Fighter1.AttackLow.started += OnLowAttackInput;
             _playerInputSystem.Fighter1.ForwardDash.started += OnRightDashInput;
             _playerInputSystem.Fighter1.BackDash.started += OnLeftDashInput;
-            _playerInputSystem.Fighter1.Down.started += OnDown;
-            _playerInputSystem.Fighter1.Down.canceled += OnDown;
+            _playerInputSystem.Fighter1.Down.started += OnDownInput;
+            _playerInputSystem.Fighter1.Down.canceled += OnDownInput;
             _playerInputSystem.Fighter1.Sway.started += OnSway;
         }
         else if (controllerID == ControllerID.Controller2)
         {
             _playerInputSystem.Fighter2.Move.performed += OnMoveInput;
             _playerInputSystem.Fighter2.Move.canceled += OnMoveInput;
-            _playerInputSystem.Fighter2.AttackHigh.started += OnAttackHighInput;
-            _playerInputSystem.Fighter2.AttackLow.started += OnAttackLowInput;
+            _playerInputSystem.Fighter2.AttackHigh.started += OnHighAttackInput;
+            _playerInputSystem.Fighter2.AttackLow.started += OnLowAttackInput;
             _playerInputSystem.Fighter2.ForwardDash.started += OnRightDashInput;
             _playerInputSystem.Fighter2.BackDash.started += OnLeftDashInput;
-            _playerInputSystem.Fighter2.Down.started += OnDown;
-            _playerInputSystem.Fighter2.Down.canceled += OnDown;
+            _playerInputSystem.Fighter2.Down.started += OnDownInput;
+            _playerInputSystem.Fighter2.Down.canceled += OnDownInput;
             _playerInputSystem.Fighter2.Sway.started += OnSway;
 
         }
@@ -59,12 +59,12 @@ public class InputController : MonoBehaviour
         {
             _playerInputSystem.Fighter1.Move.performed -= OnMoveInput;
             _playerInputSystem.Fighter1.Move.canceled -= OnMoveInput;
-            _playerInputSystem.Fighter1.AttackHigh.started -= OnAttackHighInput;
-            _playerInputSystem.Fighter1.AttackLow.started -= OnAttackLowInput;
+            _playerInputSystem.Fighter1.AttackHigh.started -= OnHighAttackInput;
+            _playerInputSystem.Fighter1.AttackLow.started -= OnLowAttackInput;
             _playerInputSystem.Fighter1.ForwardDash.started -= OnRightDashInput;
             _playerInputSystem.Fighter1.BackDash.started -= OnLeftDashInput;
-            _playerInputSystem.Fighter1.Down.started -= OnDown;
-            _playerInputSystem.Fighter1.Down.canceled -= OnDown;
+            _playerInputSystem.Fighter1.Down.started -= OnDownInput;
+            _playerInputSystem.Fighter1.Down.canceled -= OnDownInput;
             _playerInputSystem.Fighter1.Sway.started -= OnSway;
 
         }
@@ -72,12 +72,12 @@ public class InputController : MonoBehaviour
         {
             _playerInputSystem.Fighter2.Move.performed -= OnMoveInput;
             _playerInputSystem.Fighter2.Move.canceled -= OnMoveInput;
-            _playerInputSystem.Fighter2.AttackHigh.started -= OnAttackHighInput;
-            _playerInputSystem.Fighter2.AttackLow.started -= OnAttackLowInput;
+            _playerInputSystem.Fighter2.AttackHigh.started -= OnHighAttackInput;
+            _playerInputSystem.Fighter2.AttackLow.started -= OnLowAttackInput;
             _playerInputSystem.Fighter2.ForwardDash.started -= OnRightDashInput;
             _playerInputSystem.Fighter2.BackDash.started -= OnLeftDashInput;
-            _playerInputSystem.Fighter2.Down.started -= OnDown;
-            _playerInputSystem.Fighter2.Down.canceled -= OnDown;
+            _playerInputSystem.Fighter2.Down.started -= OnDownInput;
+            _playerInputSystem.Fighter2.Down.canceled -= OnDownInput;
             _playerInputSystem.Fighter2.Sway.started -= OnSway;
 
         }
@@ -95,34 +95,33 @@ public class InputController : MonoBehaviour
         _playerInputSystem.Enable();
     }
     
-    internal event Action<float> OnMovePerformed;
-    internal event Action OnMoveStopped;
+    internal event Action<float> MovePerformedAction;
+    internal event Action MoveStoppedAction;
     private void OnMoveInput(InputAction.CallbackContext context)
     {
-        if(context.performed) OnMovePerformed?.Invoke(context.ReadValue<float>());
-        if(context.canceled) OnMoveStopped?.Invoke();
+        if(context.performed) MovePerformedAction?.Invoke(context.ReadValue<float>());
+        if(context.canceled) MoveStoppedAction?.Invoke();
     }
 
-    private void OnDown(InputAction.CallbackContext context)
+    internal event Action CrouchStartedAction;
+    internal event Action CrouchStoppedAction;
+    private void OnDownInput(InputAction.CallbackContext context)
     {
-        // if (context.started)
-        // {
-        //     fighterMovesManager.Crouch();
-        // }
-        // else if (context.canceled)
-        // {
-        //     fighterMovesManager.StandUp();
-        // }
+        if (context.started) { CrouchStartedAction?.Invoke(); }
+        else if (context.canceled) { CrouchStoppedAction?.Invoke(); }
     }
 
-    private void OnAttackHighInput(InputAction.CallbackContext context)
+
+    internal event Action HighAttackAction;
+    private void OnHighAttackInput(InputAction.CallbackContext context)
     {
-        // fighterMovesManager.ExecuteAttackHigh();
+        HighAttackAction?.Invoke();
     }
 
-    private void OnAttackLowInput(InputAction.CallbackContext context)
+    internal event Action LowAttackAction;
+    private void OnLowAttackInput(InputAction.CallbackContext context)
     {
-        // fighterMovesManager.ExecuteAttackLow();
+        LowAttackAction?.Invoke();
     }
 
     private void OnRightDashInput(InputAction.CallbackContext context)

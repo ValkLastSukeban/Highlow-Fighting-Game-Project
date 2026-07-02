@@ -6,5 +6,4 @@ public class GameRulesData : ScriptableObject
     [SerializeField] internal Vector3 playersStartingPosition;
     [SerializeField] internal float roundStartShowTime;
     [SerializeField] internal bool allowWalking;
-    [SerializeField] internal float arenaHorizontalLimit;
 }

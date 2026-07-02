@@ -9,7 +9,7 @@ public enum FighterActions
     Attacking = 3,
     Blocking = 4,
     Reversal = 5,
-    Swaying = 6,
+    Swaying = 6
 }
 
 public class FighterAction : MonoBehaviour
@@ -19,6 +19,7 @@ public class FighterAction : MonoBehaviour
 
     internal void ChangeAction(FighterActions newAction)
     {
+        if (ActualAction == newAction) return;
         ActualAction = newAction;
         debugEventChannel.OnFighterActionChanged(newAction);
     }

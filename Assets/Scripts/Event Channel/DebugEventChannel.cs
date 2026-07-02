@@ -17,7 +17,5 @@ namespace Event_Channel
         {
             FighterStanceChanged?.Invoke(fighterStance);
         }
-
-        
     }
 }

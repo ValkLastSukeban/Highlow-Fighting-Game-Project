@@ -19,13 +19,8 @@ public class AnimationController : MonoBehaviour
     private static readonly int CrouchingHasH = Animator.StringToHash("Crouch");
     private static readonly int CounterHitHash = Animator.StringToHash("CounterHit");
     private static readonly int SwayHash = Animator.StringToHash("Sway");
-    
-    private float ConvertFramesToSeconds(float frames)
-    {
-        return frames / 60;
-    }
-    
-    internal void Crouch()
+
+    internal void Crouching()
     {
         animator.SetBool(CrouchingHasH, true);
     }

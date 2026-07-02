@@ -93,9 +93,11 @@ GameObject:
   - component: {fileID: 4515154468939330224}
   - component: {fileID: 6432439512034161516}
   - component: {fileID: 4332122243833493240}
+  - component: {fileID: 5996690021678692015}
+  - component: {fileID: 2757616883066287914}
   m_Layer: 0
   m_Name: Template Fighter
-  m_TagString: Boneco1
+  m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -110,14 +112,14 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: -1.2, y: -0.7, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 1.35, y: 1.35, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 7848818294728767321}
-  - {fileID: 2976607219406311075}
-  - {fileID: 1751358953853384892}
   - {fileID: 2436817502292309598}
   - {fileID: 8158591830228436303}
+  - {fileID: 2976607219406311075}
+  - {fileID: 1751358953853384892}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!212 &5486628898011800825
@@ -187,13 +189,13 @@ Rigidbody2D:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2833127792516537544}
-  m_BodyType: 1
+  m_BodyType: 0
   m_Simulated: 1
   m_UseFullKinematicContacts: 0
   m_UseAutoMass: 1
-  m_Mass: 1.6860347
-  m_LinearDamping: 0
-  m_AngularDamping: 0.05
+  m_Mass: 1.2028501
+  m_LinearDamping: 1000000
+  m_AngularDamping: 1000000
   m_GravityScale: 0
   m_Material: {fileID: 0}
   m_IncludeLayers:
@@ -205,7 +207,7 @@ Rigidbody2D:
   m_Interpolate: 0
   m_SleepingMode: 1
   m_CollisionDetection: 0
-  m_Constraints: 4
+  m_Constraints: 6
 --- !u!95 &6136011004393313407
 Animator:
   serializedVersion: 7
@@ -241,7 +243,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   gameManagerEventChannel: {fileID: 11400000, guid: 01db31ae3fe706849a807d89e6c51dc8, type: 2}
-  playerID: 0
+  controllerID: 0
 --- !u!114 &6432439512034161516
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -255,14 +257,18 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   gameManagerEventChannel: {fileID: 11400000, guid: 01db31ae3fe706849a807d89e6c51dc8, type: 2}
+  fighterRigidbody2D: {fileID: 6643139435321052749}
   inputController: {fileID: 4515154468939330224}
   animationController: {fileID: 4332122243833493240}
-  fighterRigidbody2D: {fileID: 6643139435321052749}
   moveSpeed: 4
   moveSpeedCrouching: 2
-  attackHighFrameDuration: 15
   dashDistance: 2
-  dashFrameDuration: 15
+  dashFrames: 30
+  fighterStance: {fileID: 2757616883066287914}
+  fighterAction: {fileID: 5996690021678692015}
+  fighterID: 0
+  fighterMoveHighAttack: {fileID: 6399192245040843925}
+  fighterMoveLowAttack: {fileID: 1902645041321236200}
 --- !u!114 &4332122243833493240
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -276,6 +282,32 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   animator: {fileID: 6136011004393313407}
+--- !u!114 &5996690021678692015
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2833127792516537544}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 23959662e68e43c09ba7ca0a513038d0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::FighterAction
+  debugEventChannel: {fileID: 11400000, guid: 75d89369ed7c3c7468458fb349cca7d8, type: 2}
+--- !u!114 &2757616883066287914
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2833127792516537544}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e05f881782dd4ebf9c2a250e8c115581, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::FighterStance
+  debugEventChannel: {fileID: 11400000, guid: 75d89369ed7c3c7468458fb349cca7d8, type: 2}
 --- !u!1 &2871271233273788931
 GameObject:
   m_ObjectHideFlags: 0
@@ -287,8 +319,8 @@ GameObject:
   - component: {fileID: 2976607219406311075}
   - component: {fileID: 6505433351709699944}
   - component: {fileID: 6399192245040843925}
-  m_Layer: 7
-  m_Name: Hurtbox High
+  m_Layer: 8
+  m_Name: Electric
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -367,7 +399,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f547e4d9fde470c4b90d448c7756b0c6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  attackHeight: 0
+  height: 0
+  hurtboxCollider2D: {fileID: 6505433351709699944}
+  startupFrames: 15
+  activeFrames: 4
+  recoveryFrames: 8
 --- !u!1 &3171697110060497706
 GameObject:
   m_ObjectHideFlags: 0
@@ -379,8 +415,8 @@ GameObject:
   - component: {fileID: 8158591830228436303}
   - component: {fileID: 3003639149491928912}
   - component: {fileID: 4813597560188215697}
-  m_Layer: 6
-  m_Name: Hitbox Low
+  m_Layer: 7
+  m_Name: Hurtbox Low
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -459,7 +495,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0ff210dcd27bb53498f13756caf6227a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  fighterMoves: {fileID: 0}
+  fighter: {fileID: 6432439512034161516}
 --- !u!1 &3403526325410053872
 GameObject:
   m_ObjectHideFlags: 0
@@ -471,8 +507,8 @@ GameObject:
   - component: {fileID: 1751358953853384892}
   - component: {fileID: 2500460955477563692}
   - component: {fileID: 1902645041321236200}
-  m_Layer: 7
-  m_Name: Hurtbox Low
+  m_Layer: 9
+  m_Name: Hellsweep
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -527,7 +563,7 @@ BoxCollider2D:
   m_UsedByEffector: 0
   m_CompositeOperation: 0
   m_CompositeOrder: 0
-  m_Offset: {x: 0.5, y: 0}
+  m_Offset: {x: 0.77, y: 0}
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0, y: 0}
@@ -551,7 +587,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f547e4d9fde470c4b90d448c7756b0c6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  attackHeight: 0
+  height: 0
+  hurtboxCollider2D: {fileID: 2500460955477563692}
+  startupFrames: 17
+  activeFrames: 4
+  recoveryFrames: 7
 --- !u!1 &8582946351524032539
 GameObject:
   m_ObjectHideFlags: 0
@@ -564,7 +604,7 @@ GameObject:
   - component: {fileID: 1700781414538594991}
   - component: {fileID: 6761619901930512411}
   m_Layer: 6
-  m_Name: Hitbox High
+  m_Name: Hurtbox High
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -643,4 +683,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0ff210dcd27bb53498f13756caf6227a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  fighterMoves: {fileID: 0}
+  fighter: {fileID: 6432439512034161516}

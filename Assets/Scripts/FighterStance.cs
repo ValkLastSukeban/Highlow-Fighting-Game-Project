@@ -15,6 +15,7 @@ public class FighterStance : MonoBehaviour
 
     internal void ChangeStance(FighterStances newStance)
     {
+        if (ActualStance == newStance) return;
         ActualStance = newStance;
         debugEventChannel.OnFighterStanceChanged(newStance);
     }

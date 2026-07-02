@@ -1,34 +1,18 @@
-using System;
-using DefaultNamespace.Event_Channel;
 using UnityEngine;
 
 public class Hurtbox : MonoBehaviour
 {
-    [SerializeField] private AttackHeight attackHeight;
-    private bool _hasAlreadyHit;
-    private Hitbox _lastHitboxHit;
+    [SerializeField] private Fighter fighter;
+    private Height hitboxHeight;
 
-    private void OnEnable()
+    private void Awake()
     {
-        _hasAlreadyHit = false;
+        hitboxHeight = gameObject.layer == 6 ? Height.High : Height.Low;
     }
-
-    void OnTriggerEnter2D(Collider2D other)
+    
+    private void OnTriggerEnter2D(Collider2D other)
     {
-        if (_hasAlreadyHit) return;
-        
-        _lastHitboxHit = other.GetComponent<Hitbox>();
-
-        if (_lastHitboxHit == null)
-        {
-            Debug.LogWarning("[Hitbox] found a GameObject without [Hurtbox] attached to it.");
-        }
-        else
-        {
-            _lastHitboxHit.HasBeenHit(attackHeight);
-        }
-
-        _lastHitboxHit = null;
-        _hasAlreadyHit = true;
+        fighter.HitCheck(hitboxHeight);
     }
+    
 }

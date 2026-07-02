@@ -4,7 +4,7 @@ using UnityEngine;
 public class GameManager : MonoBehaviour
 {
     [SerializeField] private GameManagerEventChannel gameManagerEventChannel;
-    [SerializeField] private FighterMoves[] fighters;
+    [SerializeField] private Fighter[] fighters;
     private void Awake()
     {
         DontDestroyOnLoad(gameObject);
@@ -12,12 +12,12 @@ public class GameManager : MonoBehaviour
 
     private void OnEnable()
     {
-        gameManagerEventChannel.PlayerHit += PlayerHasBeenHit;
+        gameManagerEventChannel.PlayerHit += FinishRound;
     }
 
     private void OnDisable()
     {
-        gameManagerEventChannel.PlayerHit -= PlayerHasBeenHit;
+        gameManagerEventChannel.PlayerHit -= FinishRound;
     }
     
     private void Start()
@@ -39,8 +39,9 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    private void PlayerHasBeenHit(FighterID fighterID)
+    private void FinishRound(FighterID fighterDowned)
     {
         
     }
+    
 }

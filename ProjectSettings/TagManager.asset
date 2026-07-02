@@ -13,10 +13,10 @@ TagManager:
   - 
   - Water
   - UI
-  - Hitbox
-  - Hurtbox
-  - 
-  - 
+  - Hurtbox High
+  - Hurtbox Low
+  - Hitbox High
+  - Hitbox Low
   - 
   - 
   - 
@@ -45,3 +45,4 @@ TagManager:
     locked: 0
   m_RenderingLayers:
   - Default
+  m_MigratedRenderPipelines: []

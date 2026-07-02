@@ -10,5 +10,5 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: e237af01bed14688ac0aeae158cae88b, type: 3}
-  m_Name: Debug Event Channel
+  m_Name: Fighter 1 Debug Event Channel
   m_EditorClassIdentifier: Assembly-CSharp::Event_Channel.DebugEventChannel
