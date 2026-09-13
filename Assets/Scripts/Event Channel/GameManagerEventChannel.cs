@@ -1,10 +1,9 @@
 using System;
 using UnityEngine;
-using UnityEngine.Events;
 
 namespace Event_Channel
 {
-    [CreateAssetMenu(fileName = "Game Manager Event Channel",menuName = "Scriptable Objects/Game Manager Event Channel")]
+    [CreateAssetMenu(fileName = "Game Manager Event Channel", menuName = "Scriptable Objects/Game Manager Event Channel")]
     public class GameManagerEventChannel : ScriptableObject
     {
         internal event Action<FighterID> PlayerHit;

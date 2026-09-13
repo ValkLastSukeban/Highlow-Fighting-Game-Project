@@ -1,25 +1,17 @@
+using System;
 using UnityEngine;
 
-public class FighterMove : MonoBehaviour
+public abstract class FighterMove : MonoBehaviour
 {
-    [SerializeField] private Height height;
-    [SerializeField] private BoxCollider2D hurtboxCollider2D;
-    [SerializeField] private float startupFrames;
-    [SerializeField] private float activeFrames;
-    [SerializeField] private float recoveryFrames;
-    internal float StartupFrames => startupFrames;
-    internal float ActiveFrames => activeFrames;
-    internal float RecoveryFrames => recoveryFrames;
-    internal MovePhase actualPhase;
-    
-    internal void EnableHurtbox()
+    [SerializeField] private int startupFrames;
+    [SerializeField] private int activeFrames;
+    [SerializeField] private int recoveryFrames;
+    internal Action MoveAction { get; private set;}
+
+    internal AttackPhase ActualPhase { get; private set; }
+
+    internal void ResetMove()
     {
-        hurtboxCollider2D.enabled = true;
+        ActualPhase = AttackPhase.Ready;
     }
-    
-    internal void DisableHurtbox()
-    {
-        hurtboxCollider2D.enabled = false;
-    }
-    
 }

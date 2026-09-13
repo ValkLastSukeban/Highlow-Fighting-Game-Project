@@ -6,14 +6,14 @@ namespace Event_Channel
     [CreateAssetMenu(fileName = "Debug Event Channel",menuName = "Scriptable Objects/Debug Event Channel")]
     public sealed class DebugEventChannel : ScriptableObject
     {
-        internal event Action<FighterActions> FighterActionChanged;
-        internal void OnFighterActionChanged(FighterActions fighterAction)
+        internal event Action<FighterStates> FighterActionChanged;
+        internal void OnFighterActionChanged(FighterStates fighterAction)
         {
             FighterActionChanged?.Invoke(fighterAction);
         }
         
-        internal event Action<FighterStances> FighterStanceChanged;
-        internal void OnFighterStanceChanged(FighterStances fighterStance)
+        internal event Action<FighterStates> FighterStanceChanged;
+        internal void OnFighterStanceChanged(FighterStates fighterStance)
         {
             FighterStanceChanged?.Invoke(fighterStance);
         }

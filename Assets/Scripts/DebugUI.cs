@@ -28,13 +28,13 @@ public class DebugUI : MonoBehaviour
             $" {actualActionString}; {actualStanceString}";
     }
 
-    private void SetFighterActionString(FighterActions action)
+    private void SetFighterActionString(FighterStates action)
     {
         actualActionString = action.ToString();
         UpdateFighterInfoText();
     }
 
-    private void SetFighterStanceString(FighterStances stance)
+    private void SetFighterStanceString(FighterStates stance)
     {
         actualStanceString = stance.ToString();
         UpdateFighterInfoText();

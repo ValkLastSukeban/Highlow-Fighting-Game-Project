@@ -4,278 +4,260 @@ using UnityEngine;
 
 public class Fighter : MonoBehaviour
 {
-    [Header("Event Channel")] [SerializeField]
-    private GameManagerEventChannel gameManagerEventChannel;
-    
-    [Header("Components")]
-    [SerializeField] private Rigidbody2D fighterRigidbody2D;
+    [Header("Event Channel")]
+    [SerializeField]
+    private GameManagerEventChannel _gameManagerEventChannel;
 
-    [Header("Scripts References")] 
-    [SerializeField] private InputController inputController;
-    [SerializeField] private AnimationController animationController;
+    [Header("Components")]
+    [SerializeField] private Rigidbody2D _fighterRigidbody2D;
+
+    [Header("Scripts References")]
+    [SerializeField] private InputController _inputController;
+    [SerializeField] private AnimationController _animationController;
 
     [Header("Fighter Values")]
-    [SerializeField] private float moveSpeed;
-    [SerializeField] private float moveSpeedCrouching;
-    private Vector2 _movementAxis;
-    
-    [SerializeField] private float dashDistance;
-    [SerializeField] private float dashFrames;
-    private float _dashInputAxis;
+    [SerializeField] private float _moveSpeed;
+    [SerializeField] private float _moveSpeedCrouching;
+    [SerializeField] private FighterStateMachine _fighterStateMachine;
 
-    private float _actionFrameCounter;
-
-    [SerializeField] private FighterStance fighterStance;
-    [SerializeField] private FighterAction fighterAction;
-    
-    [SerializeField] private FighterID fighterID = FighterID.Fighter1;
+    [SerializeField] private FighterID _fighterID = FighterID.Fighter1;
 
     [Header("Moves")]
-    [SerializeField] private FighterMove fighterMoveHighAttack;
-    [SerializeField] private FighterMove fighterMoveLowAttack;
-    
-    private ArenaSide _arenaSide;
-
-    private bool hasBeenHit;
-    
-    private event Action ExecutingAction;
+    [SerializeField] private FighterAttack _electricUppercut;
+    [SerializeField] private FighterAttack _hellSweep;
+    // [SerializeField] private FighterMoveDash fighterMoveDash;
+    private event Action FixedUpdateAction;
+    private Vector2 _horizontalAxis;
 
     internal void InitializeFighter()
     {
-        RegisterInput();
-        InitializeAction();
-        InitializeStance();
+        InitializeStateMachine();
         InitializePosition();
     }
-    private void RegisterInput()
-    {
-        if (!inputController) return;
-        inputController.MovePerformedAction += StartMoving;
-        inputController.MoveStoppedAction += StopMoving;
-        inputController.CrouchStartedAction += Crouch;
-        inputController.CrouchStoppedAction += StandUp;
-        inputController.HighAttackAction += StartHighAttack;
-        inputController.LowAttackAction += StartLowAttack;
 
-    }
-    
-    private void InitializeAction()
+    private void InitializeStateMachine()
     {
-        fighterAction.ChangeAction(FighterActions.Idle);
-    }
-
-    private void InitializeStance()
-    {
-        fighterStance.ChangeStance(FighterStances.Standing);
+        _fighterStateMachine.ChangeState(FighterStates.StandIdle);
     }
 
     private void InitializePosition()
     {
-        transform.position = fighterID == FighterID.Fighter1
+        transform.position = _fighterID == FighterID.Fighter1
             ? -GameRules.PlayersStartingPosition
             : GameRules.PlayersStartingPosition;
     }
 
+    private void OnEnable()
+    {
+        RegisterInput();
+    }
+
+    private void RegisterInput()
+    {
+        if (!_inputController) return;
+        _inputController.MovePerformedAction += StartMoving;
+        _inputController.MoveStoppedAction += StopMoving;
+        _inputController.CrouchStartedAction += StartCrouching;
+        _inputController.CrouchStoppedAction += StopCrouching;
+        _inputController.HighAttackAction += StartHighAttack;
+        _inputController.LowAttackAction += StartLowAttack;
+
+    }
+
     private void OnDisable()
     {
-        UnregisterActions();
+        UnregisterInput();
     }
 
-    private void UnregisterActions()
+    private void UnregisterInput()
     {
-        if (!inputController) return;
-        inputController.MovePerformedAction -= StartMoving;
-        inputController.MoveStoppedAction -= StopMoving;
-        inputController.CrouchStartedAction -= Crouch;
-        inputController.CrouchStoppedAction -= StandUp;
-        inputController.HighAttackAction -= StartHighAttack;
-        inputController.LowAttackAction -= StartLowAttack;
-        
+        if (!_inputController) return;
+        _inputController.MovePerformedAction -= StartMoving;
+        _inputController.MoveStoppedAction -= StopMoving;
+        _inputController.CrouchStartedAction -= StartCrouching;
+        _inputController.CrouchStoppedAction -= StopCrouching;
+        _inputController.HighAttackAction -= StartHighAttack;
+        _inputController.LowAttackAction -= StartLowAttack;
+
     }
 
-    private void StartMoving(float movementInputAxis)
+    private void StartMoving(float horizontalInputAxis)
     {
-        fighterAction.ChangeAction(FighterActions.Moving);
-        ExecutingAction = MoveAction;
-        animationController.Movement(movementInputAxis);
-        _movementAxis.x = movementInputAxis;
+
+        if (_fighterStateMachine.FighterState != FighterStates.StandIdle) return;
+        Debug.Log("StartMoving: " + horizontalInputAxis);
+        FixedUpdateAction = MoveAction;
+        if (horizontalInputAxis > 0)
+        {
+            _fighterStateMachine.ChangeState(FighterStates.WalkForward);
+        }
+        else if (horizontalInputAxis < 0)
+        {
+            _fighterStateMachine.ChangeState(FighterStates.WalkBackward);
+        }
+        _animationController.Movement(horizontalInputAxis);
+        _horizontalAxis.x = horizontalInputAxis;
+    }
+
+    private void MoveAction()
+    {
+        _fighterRigidbody2D.MovePosition(_fighterRigidbody2D.position + _horizontalAxis * _moveSpeed * Time.fixedDeltaTime);
     }
 
     private void StopMoving()
     {
-        fighterAction.ChangeAction(FighterActions.Idle);
-        ExecutingAction = IdleAction;
-        animationController.Movement(0);
-        _movementAxis.x = 0;
+        if (!_fighterStateMachine.IsWalking()) { return; }
+        Debug.Log("Stopped Moving");
+        FixedUpdateAction = EmptyAction;
+        _fighterStateMachine.ChangeState(FighterStates.StandIdle);
+        _animationController.Movement(0);
+        _horizontalAxis.x = 0;
     }
 
     private void StartDashing(float dashInputAxis)
     {
-        fighterAction.ChangeAction(FighterActions.Dashing);
-        fighterStance.ChangeStance(FighterStances.Standing);
-        ExecutingAction = DashAction;
-        _actionFrameCounter = 0;
-    }
-    
-    private void Crouch()
-    {
-        fighterStance.ChangeStance(FighterStances.Crouching);
-        animationController.Crouching();
+        FixedUpdateAction = DashAction;
+        _fighterStateMachine.ChangeState(FighterStates.Dashing);
     }
 
-    private void StandUp()
+    private void DashAction()
     {
-        fighterStance.ChangeStance(FighterStances.Standing);
-        animationController.StandingUp();
     }
 
-    
-    private void GotBlocked()
+    private void StartCrouching()
     {
-        animationController.BlockHigh();
-        animationController.BlockLow();
+        if (_fighterStateMachine.FighterState != FighterStates.StandIdle ||
+            _fighterStateMachine.FighterState == FighterStates.WalkForward ||
+            _fighterStateMachine.FighterState == FighterStates.WalkBackward) return;
+        FixedUpdateAction = CrouchAction;
+        _fighterStateMachine.ChangeState(FighterStates.CrouchIdle);
+        _animationController.Crouching();
     }
-
-    private void GotCountered()
+    private void CrouchAction()
     {
-        animationController.CounterHit();
+
+    }
+    private void StopCrouching()
+    {
+        if (_fighterStateMachine.FighterState != FighterStates.CrouchIdle) return;
+        FixedUpdateAction = EmptyAction;
+        _fighterStateMachine.ChangeState(FighterStates.StandIdle);
+        _animationController.StandingUp();
     }
 
     private void StartHighAttack()
     {
-        fighterStance.ChangeStance(FighterStances.Standing);
-        fighterAction.ChangeAction(FighterActions.Attacking);
-        ExecutingAction = () => ExecuteFighterMove(fighterMoveHighAttack);
-        animationController.AttackHigh();
-        _actionFrameCounter = 0;
+        if(_fighterStateMachine.IsStanding() || _fighterStateMachine.IsWalking())
+        {
+            Debug.Log("Start High Attack");
+            FixedUpdateAction = () => AttackAction(_electricUppercut);
+            _fighterStateMachine.ChangeState(FighterStates.StandAttack);
+            _animationController.AttackHigh();
+        }
     }
 
     private void StartLowAttack()
     {
-        fighterStance.ChangeStance(FighterStances.Crouching);
-        fighterAction.ChangeAction(FighterActions.Attacking);
-        ExecutingAction = () => ExecuteFighterMove(fighterMoveLowAttack);
-        animationController.AttackLow();
-        _actionFrameCounter = 0;
-    }
-    
-    internal void Sway()
-    {
-        animationController.Sway();
+        if(_fighterStateMachine.IsCrouching())
+        {
+            Debug.Log("Start Low Attack");
+            FixedUpdateAction = () => AttackAction(_hellSweep);
+            _fighterStateMachine.ChangeState(FighterStates.CrouchAttack);
+            _animationController.AttackLow();
+        }
     }
 
-    
+    internal void Sway()
+    {
+        _animationController.Sway();
+    }
 
     private void FixedUpdate()
     {
-        ExecutingAction?.Invoke();
-    }
-    
-    private void DashAction()
-    {
-        _actionFrameCounter -= Time.fixedDeltaTime;
+        if(FixedUpdateAction != null)
+        {
+            FixedUpdateAction?.Invoke();
+            Debug.Log("Fixed Update Action Invoked: " + FixedUpdateAction.Method.Name);
 
-        fighterRigidbody2D.MovePosition(fighterRigidbody2D.position * dashDistance * Time.fixedDeltaTime);
-
-        if (_actionFrameCounter <= 0)
-        {
-            fighterAction.ChangeAction(FighterActions.Idle);
-        }
-    }
-    
-    private void MoveAction()
-    {
-        if (fighterStance.ActualStance == FighterStances.Standing)
-        {
-            fighterRigidbody2D.MovePosition(fighterRigidbody2D.position +_movementAxis * moveSpeed * Time.fixedDeltaTime);
-        }
-        else if (fighterStance.ActualStance == FighterStances.Crouching)
-        {
-            fighterRigidbody2D.MovePosition(fighterRigidbody2D.position +_movementAxis * moveSpeedCrouching * Time.fixedDeltaTime);
         }
     }
 
-    private void IdleAction() {}
+    private void EmptyAction() { }
 
-    private void ExecuteFighterMove(FighterMove move)
+    private void AttackAction(FighterAttack attack)
     {
-        Debug.Log($"Executing Fighter Move: {move.transform.gameObject.name} + { _actionFrameCounter }");
-
-        if (_actionFrameCounter == 0)
+        Debug.Log("Attack Action Invoked: " + attack.name);
+        if (attack.ActualAttackPhase != AttackPhase.Ready)
         {
-            Debug.Log($"Move Startup + {move.StartupFrames}");
-            move.actualPhase = MovePhase.Startup;
+            Debug.Log("Attack was ready and is started");
+            attack.StartAttack();
+            _fighterStateMachine.ChangeState(attack.AttackHeight == Height.High ? FighterStates.StandAttack : FighterStates.CrouchAttack);
         }
-
-        else if (_actionFrameCounter >= move.StartupFrames && move.actualPhase == MovePhase.Startup)
+        if (attack.ActualAttackPhase == AttackPhase.Finished)
         {
-            Debug.Log($"Move Active + {move.ActiveFrames}");
-
-            move.actualPhase = MovePhase.Active;
-            move.EnableHurtbox();
-        }
-
-        else if (_actionFrameCounter >= move.ActiveFrames && move.actualPhase == MovePhase.Active)
-        {
-            Debug.Log($"Move Recovery + {move.RecoveryFrames}");
-
-            move.actualPhase = MovePhase.Recovery;
-            move.DisableHurtbox();
-        }
-
-        _actionFrameCounter ++;
-        
-        if (_actionFrameCounter >= move.RecoveryFrames && move.actualPhase == MovePhase.Recovery)
-        {
-            Debug.Log("Move Finished");
-
-            fighterAction.ChangeAction(FighterActions.Idle);
-            fighterStance.ChangeStance(FighterStances.Standing);
-            ExecutingAction = IdleAction;
+            Debug.Log("Attacking has Finished");
+            if (attack.AttackHeight == Height.High)
+            {
+                _fighterStateMachine.ChangeState(FighterStates.StandIdle);
+            }
+            else if (attack.AttackHeight == Height.Low)
+            {
+                _fighterStateMachine.ChangeState(FighterStates.CrouchIdle);
+            }
         }
     }
-    
-    internal void HitCheck(Height hitHeight)
+
+    internal bool BlockCheck(Height hitHeight)
     {
-        if (hasBeenHit) return;
+        if (_fighterStateMachine.FighterState == FighterStates.KnockedOut) return false;
         if (hitHeight == Height.High)
         {
-            if (fighterAction.IsAbleToBlock())
-            {
-                animationController.BlockHigh();
-                Debug.Log("high block");
-            }
-            else
-            {
-                animationController.LaunchedWhileStanding();
-                gameManagerEventChannel.OnPlayerHit(fighterID);
-                hasBeenHit = true;
-            }
+            return HighBlockCheck();
         }
-
         if (hitHeight == Height.Low)
         {
-            if (fighterStance.IsCrouching())
-            {
-                if (fighterAction.IsAbleToBlock())
-                {
-                    animationController.BlockLow();
-                    Debug.Log("low block");
-                }
-                else
-                {
-                    animationController.KnockedOutWhileCrouching();
-                    hasBeenHit = true;
-                }
-               
-            }
+            return LowBlockCheck();
+        }
+        return false;
+    }
 
-            if (fighterStance.IsStanding())
-            {
-                animationController.KnockedOutWhileStanding();
-                gameManagerEventChannel.OnPlayerHit(fighterID);
-                hasBeenHit = true;
-            }
+    private bool HighBlockCheck()
+    {
+        if (_fighterStateMachine.FighterState == FighterStates.WalkBackward)
+        {
+            _animationController.BlockHigh();
+            _fighterStateMachine.ChangeState(FighterStates.StandBlockStun);
+            Debug.Log("high block");
+            return true;
+        }
+        GotHit(Height.High);
+        return false;
+    }
+    private bool LowBlockCheck()
+    {
+        if (_fighterStateMachine.FighterState == FighterStates.CrouchBlocking)
+        {
+            _animationController.BlockLow();
+            _fighterStateMachine.ChangeState(FighterStates.CrouchBlockStun);
+            Debug.Log("low block");
+            return true;
+        }
+        GotHit(Height.Low);
+        return false;
+    }
+
+    private void GotHit(Height hitHeight)
+    {
+        _fighterStateMachine.ChangeState(FighterStates.KnockedOut);
+        _gameManagerEventChannel.OnPlayerHit(_fighterID);
+
+        if (hitHeight == Height.High)
+        {
+            _animationController.LaunchedWhileStanding();
+        }
+        else if (hitHeight == Height.Low)
+        {
+            _animationController.KnockedOutWhileCrouching();
         }
     }
 }

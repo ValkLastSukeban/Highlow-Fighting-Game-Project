@@ -225,6 +225,10 @@ PrefabInstance:
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 6432439512034161516, guid: 3a345e24a0c71b74c89611740f4f15aa, type: 3}
+      propertyPath: _fighterID
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6432439512034161516, guid: 3a345e24a0c71b74c89611740f4f15aa, type: 3}
       propertyPath: highAttackFrameDuration
       value: 0.5
       objectReference: {fileID: 0}

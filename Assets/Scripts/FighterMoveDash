@@ -1,0 +1,20 @@
+public class FighterMoveDash : FighterMove
+{
+    [SerializeField] private readonly float dashDistance;
+    [SerializeField] private readonly float dashFrames;
+    private void Start()
+    {
+        MoveAction = DashAction;
+    }
+    private void DashAction()
+    {
+        _actionFrameCounter -= Time.fixedDeltaTime;
+
+        fighterRigidbody2D.MovePosition(fighterRigidbody2D.position * dashDistance * Time.fixedDeltaTime);
+
+        if (_actionFrameCounter <= 0)
+        {
+            fighterStateMachine.ChangeState(FighterStates.StandIdle);
+        }
+    }
+}
